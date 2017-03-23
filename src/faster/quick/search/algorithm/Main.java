@@ -135,7 +135,7 @@ public class Main {
 		return maximalExpectedShiftPosition;
 	}
 
-	private boolean isMatch(int offset, char[] pattern, char[] text) {
+	private boolean isMatchFound(int offset, char[] pattern, char[] text) {
 		for (int i = 0; i < pattern.length; i++) {
 			if (pattern[i] != text[i + offset]) {
 				return false;
@@ -175,7 +175,7 @@ public class Main {
 				}
 			}
 			
-			if (isMatch(i, pattern, text)) {
+			if (isMatchFound(i, pattern, text)) {
 				indices.add(i);
 			}
 			
