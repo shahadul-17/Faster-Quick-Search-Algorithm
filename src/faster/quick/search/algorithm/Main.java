@@ -24,27 +24,15 @@ public class Main {
 		
 		scanner.close();		// closing scanner...
 		
-		alphabets = main.getAlphabets(pattern);
-		
-		main.print(alphabets, "\nAlphabets\t\t\t");
-		main.print(main.fasterQuickSearch(alphabets, pattern, text), "Match found at indices\t\t");
-	}
-	
-	private void print(int[] array, String text) {
-		text += "= [ ";
-		
-		for (int i = 0; i < array.length; i++) {
-			text += array[i];
+		if (pattern.length > 0) {
+			alphabets = main.getAlphabets(pattern);
 			
-			if (i == array.length - 1) {
-				text += " ]";
-			}
-			else {
-				text += ", ";
-			}
+			main.print(alphabets, "\nAlphabets\t\t\t");
+			main.print(main.fasterQuickSearch(alphabets, pattern, text), "Match found at indices\t\t");
 		}
-		
-		System.out.println(text);
+		else {
+			System.out.println("\nInvalid pattern detected...");
+		}
 	}
 	
 	private void print(char[] array, String text) {
@@ -53,15 +41,56 @@ public class Main {
 		for (int i = 0; i < array.length; i++) {
 			text += array[i];
 			
-			if (i == array.length - 1) {
-				text += " ]";
-			}
-			else {
+			if (i != array.length - 1) {
 				text += ", ";
 			}
 		}
 		
-		System.out.println(text);
+		System.out.println(text + " ]");
+	}
+	
+	private void print(int[] array, String text) {
+		text += "= [ ";
+		
+		for (int i = 0; i < array.length; i++) {
+			text += array[i];
+			
+			if (i != array.length - 1) {
+				text += ", ";
+			}
+		}
+		
+		System.out.println(text + " ]");
+	}
+	
+	private boolean isMatchFound(int offset, char[] pattern, char[] text) {
+		for (int i = 0; i < pattern.length; i++) {
+			if (pattern[i] != text[i + offset]) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+	
+	private int getIndexOf(char character, char[] alphabets) {
+		for (int i = 0; i < alphabets.length; i++) {
+			if (alphabets[i] == character) {
+				return i;
+			}
+		}
+		
+		return -1;
+	}
+	
+	private int[] toIntegerArray(ArrayList<Integer> arrayList) {
+		int[] integerArray = new int[arrayList.size()];
+		
+		for (int i = 0; i < integerArray.length; i++) {
+			integerArray[i] = arrayList.get(i);
+		}
+		
+		return integerArray;
 	}
 	
 	private char[] getAlphabets(char[] pattern) {
@@ -88,22 +117,12 @@ public class Main {
 		return alphabets;
 	}
 	
-	private int getIndexOf(char character, char[] alphabets) {
-		for (int i = 0; i < alphabets.length; i++) {
-			if (alphabets[i] == character) {
-				return i;
-			}
-		}
-		
-		return -1;
-	}
-	
 	private int[] getBadCharacterShifts(int patternLength, char[] alphabets, char[] pattern) {
 		int i;
 		int[] badCharacterShiftArray = new int[alphabets.length];
 		
 		for (i = 0; i < alphabets.length; i++) {
-			badCharacterShiftArray[i] = patternLength;
+			badCharacterShiftArray[i] = patternLength + 1;
 		}
 		
 		for (i = 0; i < patternLength; i++) {
@@ -134,29 +153,9 @@ public class Main {
 
 		return maximalExpectedShiftPosition;
 	}
-
-	private boolean isMatchFound(int offset, char[] pattern, char[] text) {
-		for (int i = 0; i < pattern.length; i++) {
-			if (pattern[i] != text[i + offset]) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-	
-	private int[] getIntegerArray(ArrayList<Integer> arrayList) {
-		int[] integerArray = new int[arrayList.size()];
-		
-		for (int i = 0; i < integerArray.length; i++) {
-			integerArray[i] = arrayList.get(i);
-		}
-		
-		return integerArray;
-	}
 	
 	private int[] fasterQuickSearch(char[] alphabets, char[] pattern, char[] text) {
-		int i = 0, maximalExpectedShiftPosition = getMaximalExpectedShiftPosition(alphabets, pattern);
+		int i = 0, tempIndex, maximalExpectedShiftPosition = getMaximalExpectedShiftPosition(alphabets, pattern);
 		int[] nextBadCharacterShifts = getBadCharacterShifts(maximalExpectedShiftPosition, alphabets, pattern),
 				badCharacterShifts = getBadCharacterShifts(pattern.length, alphabets, pattern);
 		
@@ -168,10 +167,14 @@ public class Main {
 		
 		while (i <= text.length - pattern.length) {
 			while (pattern[maximalExpectedShiftPosition] != text[i + maximalExpectedShiftPosition]) {
-				i += nextBadCharacterShifts[getIndexOf(text[i + maximalExpectedShiftPosition], alphabets)];
+				if ((tempIndex = getIndexOf(text[i + maximalExpectedShiftPosition], alphabets)) == -1) {
+					break;
+				}
+				
+				i += nextBadCharacterShifts[tempIndex];
 				
 				if (i >= text.length - pattern.length) {
-					return null;
+					return toIntegerArray(indices);
 				}
 			}
 			
@@ -179,10 +182,14 @@ public class Main {
 				indices.add(i);
 			}
 			
-			i += badCharacterShifts[getIndexOf(text[i + pattern.length], alphabets)];
+			if ((tempIndex = i + pattern.length) >= text.length) {
+				break;
+			}
+			
+			i += badCharacterShifts[getIndexOf(text[tempIndex], alphabets)];
 		}
 		
-		return getIntegerArray(indices);
+		return toIntegerArray(indices);
 	}
 	
 }
