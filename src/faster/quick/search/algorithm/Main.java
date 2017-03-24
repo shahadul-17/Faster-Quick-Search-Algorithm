@@ -162,7 +162,7 @@ public class Main {
 		ArrayList<Integer> indices = new ArrayList<Integer>();
 		
 		System.out.println("Maximal expected shift position\t= " + maximalExpectedShiftPosition);
-		print(nextBadCharacterShifts, "Next\t\t\t\t");
+		print(nextBadCharacterShifts, "Next bad character shifts\t");
 		print(badCharacterShifts, "Bad character shifts\t\t");
 		
 		while (i <= text.length - pattern.length) {
